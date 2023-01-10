@@ -17,6 +17,10 @@
 #include "src/utils.hh"
 #include "src/program.hh"
 #include "src/obj.hh"
+#include "src/camera.hh"
+#include "src/mouse.hh"
+#include "src/input.hh"
+#include "src/shaders_init.hh"
 
 #define HEIGHT 900
 #define WIDTH 1400
@@ -81,7 +85,7 @@ void init_shaders()
 {
     const std::string shaders[] = {"shaders/vertex_simple.shd", "shaders/fragment.shd"};
     GLenum types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
-    program *bunny_prog = program::make_program(shaders, types, 2);
+    program *bunny_prog = program::make_program(shaders, types, 2, shader_func(init_bunny_shader));
     bunny_prog->add_object(setup_bunny(bunny_prog->get_program_id()));
     programs.push_back(bunny_prog);
 }
@@ -99,25 +103,26 @@ int main()
         std::cerr << "Programs not initialized !" << std::endl;
         std::exit(1);
     }
-    // init_object();
 
-    /*Camera *camera = new Camera();
+    Camera *camera = new Camera();
 
     Mouse::init_mouse(camera);
     glfwSetCursorPosCallback(window, Mouse::mouse_callback);
-    // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);*/
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     while (!glfwWindowShouldClose(window))
     {
-
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         programs[0]->use();
-        programs[0]->bind_objects();
+        programs[0]->shader_function(programs[0], camera);
+        //programs[0]->bind_objects();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        process_input(window, camera);
     }
+    glfwTerminate();
 
     return 0;
 }

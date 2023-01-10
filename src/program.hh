@@ -13,6 +13,9 @@ class program;
 
 #include "utils.hh"
 #include "obj.hh"
+#include "camera.hh"
+
+typedef void (*shader_func)(program *, Camera*);
 
 class program
 {
@@ -26,6 +29,7 @@ private:
     bool ready_ = false;
 
 public:
+    shader_func shader_function;
     GLuint values[12];
     program() = default;
     ~program() = default;
@@ -55,7 +59,7 @@ public:
         objects_.push_back(object);
     }
 
-    static program *make_program(const std::string shaders_path[], GLenum shaders_type[], int size)
+    static program *make_program(const std::string shaders_path[], GLenum shaders_type[], int size, shader_func shader_function)
     {
         program *prog = new program();
 
@@ -72,6 +76,7 @@ public:
         }
 
         prog->link_program();
+        prog->shader_function = shader_function;
 
         return prog;
     }

@@ -8,13 +8,13 @@
 
 CC = g++
 
-CPP_FILES = src/utils.cc src/camera.cc src/input.cc src/program.cc src/obj.cc
+CPP_FILES = src/utils.cc src/input.cc src/program.cc src/obj.cc src/shaders_init.cc
 CPP_FILES +=
-HXX_FILES = src/utils.hh src/camera.hh src/input.hh src/program.hh objects/bunny.hh src/obj.hh
+HXX_FILES = src/utils.hh src/camera.hh src/input.hh src/program.hh objects/bunny.hh src/obj.hh src/mouse.hh src/shaders_init.hh
 HXX_FILES +=
 OBJ_FILES = $(CPP_FILES:.cc=.o)
 
-CXX_FLAGS += -Wall -Wextra -O3 -g -std=c++11
+CXX_FLAGS += -Wall -Wextra -O3 -g -std=c++17
 CXX_FLAGS +=
 CXX_FLAGS += -m64 -march=native
 CXX_FLAGS += -fopt-info-vec-optimized 
