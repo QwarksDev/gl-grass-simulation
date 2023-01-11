@@ -21,11 +21,13 @@
 #include "src/mouse.hh"
 #include "src/input.hh"
 #include "src/shaders_init.hh"
+#include "src/grass.hh"
 
 #define HEIGHT 900
 #define WIDTH 1400
 
 std::vector<program *> programs;
+grass *grass_main;
 
 void framebuffer_size_callback(__attribute__((unused)) GLFWwindow *window,
                                int width, int height)
@@ -83,11 +85,19 @@ void init_GL()
 
 void init_shaders()
 {
-    const std::string shaders[] = {"shaders/vertex_simple.shd", "shaders/fragment.shd"};
-    GLenum types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
-    program *bunny_prog = program::make_program(shaders, types, 2, shader_func(init_bunny_shader));
+    // Prog bunny
+    const std::string bunny_shaders[] = {"shaders/vertex_simple.shd", "shaders/fragment.shd"};
+    GLenum bunny_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
+    program *bunny_prog = program::make_program(bunny_shaders, bunny_types, 2, shader_func(init_bunny_shader));
     bunny_prog->add_object(setup_bunny(bunny_prog->get_program_id()));
     programs.push_back(bunny_prog);
+
+    // Prog grass
+    const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd"};
+    GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
+    program *grass_prog = program::make_program(grass_shaders, grass_types, 2, nullptr);
+    grass_main = new grass(glm::vec3(0.0, 0.0, 0.0), glm::vec3(10.0, 0.0, 10.0), 10, 10, grass_prog);
+    programs.push_back(grass_prog);
 }
 
 int main()
@@ -113,9 +123,13 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        // Bunny
         programs[0]->use();
         programs[0]->shader_function(programs[0], camera);
-        //programs[0]->bind_objects();
+
+        // Grass
+        programs[1]->use();
+        grass_main->init_shader(camera);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -123,6 +137,7 @@ int main()
         process_input(window, camera);
     }
     glfwTerminate();
+    delete grass_main;
 
     return 0;
 }

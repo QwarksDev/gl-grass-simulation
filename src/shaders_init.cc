@@ -21,3 +21,9 @@ void init_bunny_shader(program *program, Camera *camera)
     init_view_projection(program, camera->get_view());
     program->bind_objects();
 }
+
+void init_grass_shader(program *program, Camera *camera)
+{
+    init_view_projection(program, camera->get_view());
+    program->bind_objects();
+}
