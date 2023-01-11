@@ -92,11 +92,17 @@ void init_shaders()
     bunny_prog->add_object(setup_bunny(bunny_prog->get_program_id()));
     programs.push_back(bunny_prog);
 
+    // Prog grass compute
+    /*const std::string compute_grass_shaders[] = {"shaders/grass/compute_grass.shd"};
+    GLenum compute_grass_types[] = {GL_COMPUTE_SHADER};
+    program *compute_grass_prog = program::make_program(compute_grass_shaders, compute_grass_types, 2, nullptr);
+    programs.push_back(compute_grass_prog);*/
+
     // Prog grass
-    const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd"};
-    GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
+    const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd", "shaders/grass/tess_eval_grass.shd", "shaders/grass/tess_control_grass.shd"};
+    GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_TESS_EVALUATION_SHADER, GL_TESS_CONTROL_SHADER};
     program *grass_prog = program::make_program(grass_shaders, grass_types, 2, nullptr);
-    grass_main = new grass(glm::vec3(0.0, 0.0, 0.0), glm::vec3(10.0, 0.0, 10.0), 10, 10, grass_prog);
+    grass_main = new grass(glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 1.0), 20, 20, grass_prog);
     programs.push_back(grass_prog);
 }
 
@@ -122,10 +128,16 @@ int main()
 
     while (!glfwWindowShouldClose(window))
     {
+        Time::update_time_passed();
+        
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         // Bunny
         programs[0]->use();
         programs[0]->shader_function(programs[0], camera);
+
+        // Compute shader
+        /*programs[1]->use();
+        grass_main->init_compute_shader();*/
 
         // Grass
         programs[1]->use();

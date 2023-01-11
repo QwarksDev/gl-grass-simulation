@@ -1,0 +1,57 @@
+#version 450
+
+layout (quads, equal_spacing, ccw) in;
+
+uniform mat4 view;
+//uniform int nb_grass;
+
+uniform mat4 projection_matrix;
+uniform mat4 model_view_matrix;
+//uniform vec3 bezier_points[500];
+
+in int grass_id[];
+
+out vec3 tess_normal;
+out vec3 view_dir;
+
+/**
+ * @brief Calculer un point sur une courbe de Bézier
+ * @param i Indice du point de contrôle (base gauche (0) ou droite(1))
+ * @param step Étape de la courbe de Bézier
+ * @return Point sur la courbe de Bézier
+ */
+/*vec3 Bezier(int i, float step_) {
+    int id = grass_id[0];
+    return bezier_points[4 * id + i] * (1 - step_) * (1 - step_)
+         + bezier_points[4 * id + 2] * (1 - step_) * step_       * 2.0f
+         + bezier_points[4 * id + 3] * step_       * step_;
+}*/
+
+// void main() {
+//     // Définir les points de contrôle de la courbe de Bézier
+//     vec3 base(0, 0, 0);
+//     vec3 curve(0, 0, 8);
+//     vec3 tip(4, 6, 8);
+// 
+//     // Utiliser la fonction pour calculer des points sur la courbe de Bézier à des étapes données
+//     vec3 point1 = Bezier(base, curve, tip, 0.25f);
+//     vec3 point2 = Bezier(base, curve, tip, 0.5f);
+//     vec3 point3 = Bezier(base, curve, tip, 0.75f);
+// }
+
+void main() {
+    /*vec3 p;
+    if (gl_TessCoord.y > 0.5)
+        p = Bezier(1, gl_TessCoord.y);
+    else
+        p = Bezier(0, gl_TessCoord.y);
+    
+    gl_Position = projection_matrix * model_view_matrix * vec4(p, 1.0f);*/
+
+ 	vec4 p1 = mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x);
+     vec4 p2 = mix(gl_in[3].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x); 
+     vec4 p = mix(p1, p2, gl_TessCoord.y);
+ 
+     gl_Position = projection_matrix * model_view_matrix * p; 
+}
+

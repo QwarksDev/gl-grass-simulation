@@ -11,6 +11,9 @@ public:
     int size;
     GLuint vao_id;
     std::vector<GLfloat> vertex_buffer_data;
+    std::vector<vec3> bezier_buffer; 
+    GLint vbo_bezier;
+
     program *prog;
 
     grass(glm::vec3 start_corner, glm::vec3 end_corner, int x_density, int z_density, program *prog_)
@@ -27,6 +30,7 @@ public:
     }
 
     void init_shader(Camera *camera);
+    void init_compute_shader();
 
 private:
     glm::vec3 *generate_grass_positions(glm::vec3 start_corner, glm::vec3 end_corner, int x_density, int y_density);
