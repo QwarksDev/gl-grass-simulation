@@ -1,6 +1,7 @@
 #include <vector>
 #include "obj.hh"
 #include "../objects/bunny_dec.hh"
+#include "../objects/floor.hh"
 #include "utils.hh"
 
 
@@ -51,4 +52,36 @@ obj *setup_bunny(uint progId)
     }
     glBindVertexArray(0);
     return new obj(bunny_vao_id, vertex_buffer_data);
+}
+
+
+obj *setup_floor(uint progId) 
+{
+
+    GLuint vbo_id;
+    GLint vertex_location = glGetAttribLocation(progId, "position");
+    check_gl_error(__LINE__, __FILE__);
+    GLuint vao_id;
+    glGenVertexArrays(1, &vao_id);
+    check_gl_error(__LINE__, __FILE__);
+    glBindVertexArray(vao_id);
+    check_gl_error(__LINE__, __FILE__);
+
+    glGenBuffers(1, &vbo_id);
+    check_gl_error(__LINE__, __FILE__);
+    if (vertex_location != -1)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+        check_gl_error(__LINE__, __FILE__);
+        glBufferData(GL_ARRAY_BUFFER, vertex_floor.size() * sizeof(float),
+                     vertex_floor.data(), GL_STATIC_DRAW);
+        check_gl_error(__LINE__, __FILE__);
+        glVertexAttribPointer(vertex_location, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        check_gl_error(__LINE__, __FILE__);
+        glEnableVertexAttribArray(vertex_location);
+        check_gl_error(__LINE__, __FILE__);
+    }
+
+    glBindVertexArray(0);
+    return new obj(vao_id, vertex_buffer_data);
 }

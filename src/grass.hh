@@ -16,6 +16,7 @@ public:
     std::vector<vec3> bezier_middle;
     std::vector<vec3> bezier_end;
     GLuint *vbos_ids; 
+    std::vector<float> heights;
 
 
     program *prog;

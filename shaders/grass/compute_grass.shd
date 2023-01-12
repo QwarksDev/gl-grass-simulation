@@ -1,21 +1,71 @@
 #version 450
 //#extension GL_ARB_compute_shader: enable
 
+// One thread per vertex
 layout(local_size_x = 1024) in;
 
 layout(std430, binding = 0) buffer bezier_points {
     float bezier_end[];
 };
 
+layout(std430, binding = 1) buffer base_position {
+    float position_blade[];
+};
+
+layout(std430, binding = 2) buffer height_array {
+    float height[];
+};
+
+layout(std430, binding = 3) buffer bezier_points2 {
+    float bezier_middle[];
+};
+
 uniform float anim_time;
+
+float strength = 0.4f;
+vec3 direction = normalize(vec3(2.0f, 0.0f, 0.0f));
+
+float get_strength(vec2 pos)
+{
+    return strength * sin(anim_time + (pos.x + pos.y));
+}
+
+vec3 get_direction(vec2 pos)
+{
+    return direction;
+}
 
 // Wind and get back gestion
 void main() {
     uint id = gl_GlobalInvocationID.x;
-    bezier_end[id].y += anim_time * 0.000000000000000001;
-    /*for (uint index = id * 6; index < id * 6 + 7; index++) 
-    { 
-        bezier_end[index].y = anim_time;
-    }*/
 
+    vec3 curr_position = vec3(position_blade[id / 6 * 3],
+                         position_blade[id / 6 * 3 + 1],
+                         position_blade[id / 6 * 3 + 2]);
+
+    float curr_height = height[id / 6];
+
+    vec3 wind_dir = get_strength(curr_position.xy)
+                  * normalize(get_direction(curr_position.xy));
+    
+    vec3 displacement = wind_dir * curr_height;
+
+    float h = sqrt(curr_height * curr_height / length(displacement) * length(displacement));
+
+    vec3 middle_position = curr_position + vec3(0.0f, 2.0f * h / 3.0f, 0.0f);
+
+    bezier_middle[id * 3] = middle_position.x;
+    bezier_middle[id * 3 + 1] = middle_position.y;
+    bezier_middle[id * 3 + 2] = middle_position.z;
+
+    vec3 tip_position = curr_position + displacement + vec3(0.0f, h, 0.0f);
+
+    bezier_end[id * 3] = tip_position.x;
+    bezier_end[id * 3 + 1] = tip_position.y;
+    bezier_end[id * 3 + 2] = tip_position.z;
+    
+    /*for (uint index = id * 6; index < id * 6 + 7; index+=6) 
+    { 
+        bezier_end[index * 3 + 1] = anim_time;
+    }*/
 }

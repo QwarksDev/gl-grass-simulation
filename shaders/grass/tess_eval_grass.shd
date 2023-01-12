@@ -27,20 +27,12 @@ vec3 Bezier(float step, vec3 bezier_base, vec3 bezier_middle, vec3 bezier_end) {
 
 void main() {
     vec3 p;
-    //if (control_out.bezier_base1.x < -10.0)
-    {
+
     if (gl_TessCoord.x > 0.5)
         p = Bezier(gl_TessCoord.y, control_out.bezier_base2, control_out.bezier_middle, control_out.bezier_end);
     else
         p = Bezier(gl_TessCoord.y, control_out.bezier_base1, control_out.bezier_middle, control_out.bezier_end);
     
     gl_Position = projection_matrix * model_view_matrix * vec4(p, 1.0f);
-    }
-
- 	/*vec4 p1 = mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x);
-     vec4 p2 = mix(gl_in[3].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x); 
-     vec4 p = mix(p1, p2, gl_TessCoord.y);
- 
-     gl_Position = projection_matrix * model_view_matrix * p;*/
 }
 

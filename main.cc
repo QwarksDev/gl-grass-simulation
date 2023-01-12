@@ -87,7 +87,7 @@ void init_GL()
     check_gl_error(__LINE__, __FILE__);
 
     // glEnable(GL_CULL_FACE);
-    glClearColor(1.0, 0.0, 0.0, 1.0);
+    glClearColor(135.0 / 255.0, 206.0 / 255.0, 235.0 / 255.0, 1.0);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -100,22 +100,29 @@ void init_shaders()
     // Prog bunny
     const std::string bunny_shaders[] = {"shaders/vertex_simple.shd", "shaders/fragment.shd"};
     GLenum bunny_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
-    program *bunny_prog = program::make_program(bunny_shaders, bunny_types, 2, shader_func(init_bunny_shader));
+    program *bunny_prog = program::make_program(bunny_shaders, bunny_types, 2);
     bunny_prog->add_object(setup_bunny(bunny_prog->get_program_id()));
     programs.push_back(bunny_prog);
 
     // Prog grass compute
     const std::string compute_grass_shaders[] = {"shaders/grass/compute_grass.shd"};
     GLenum compute_grass_types[] = {GL_COMPUTE_SHADER};
-    program *compute_grass_prog = program::make_program(compute_grass_shaders, compute_grass_types, 1, nullptr);
+    program *compute_grass_prog = program::make_program(compute_grass_shaders, compute_grass_types, 1);
     programs.push_back(compute_grass_prog);
 
     // Prog grass
     const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd", "shaders/grass/tess_eval_grass.shd", "shaders/grass/tess_control_grass.shd"};
     GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_TESS_EVALUATION_SHADER, GL_TESS_CONTROL_SHADER};
-    program *grass_prog = program::make_program(grass_shaders, grass_types, 4, nullptr);
-    grass_main = new grass(glm::vec3(0.5, 0.0, 0.0), glm::vec3(1.5, 0.0, 1.0), 5, 5, grass_prog, 0.1, 0.4);
+    program *grass_prog = program::make_program(grass_shaders, grass_types, 4);
+    grass_main = new grass(glm::vec3(0.5, 0.0, 0.0), glm::vec3(3.0, 0.0, 2.5), 20, 20, grass_prog, 0.1, 0.4);
     programs.push_back(grass_prog);
+    
+    // Prog floor
+    const std::string floor_shaders[] = {"shaders/vertex_simple.shd", "shaders/fragment.shd"};
+    GLenum floor_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
+    program *floor_prog = program::make_program(bunny_shaders, bunny_types, 2);
+    bunny_prog->add_object(setup_floor(floor_prog->get_program_id()));
+    programs.push_back(floor_prog);
 }
 
 int main()
@@ -145,7 +152,11 @@ int main()
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         // Bunny
         programs[0]->use();
-        programs[0]->shader_function(programs[0], camera);
+        init_simple_shaders(programs[0], camera, glm::vec3(1.0, 1.0, 1.0));
+
+        // Floor
+        programs[3]->use();
+        init_simple_shaders(programs[3], camera, glm::vec3(155.0 / 255.0, 118.0 / 255.0, 83.0 / 255.0));
 
         // Compute shader
         programs[1]->use();
@@ -154,6 +165,7 @@ int main()
         // Grass
         programs[2]->use();
         grass_main->init_shader(camera);
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -16,3 +16,4 @@ class obj
 };
 
 obj *setup_bunny(GLuint progId);
+obj *setup_floor(uint progId); 

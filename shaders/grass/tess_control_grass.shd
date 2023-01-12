@@ -27,6 +27,9 @@ patch out CONTROL_OUT
   vec3 bezier_end;
 } control_out;
 
+uniform vec3 camera_position; 
+uniform float render_distance;
+
 layout(vertices = 1) out; 
 
 void main() {
@@ -35,13 +38,20 @@ void main() {
     control_out.bezier_middle = v_out[gl_InvocationID].bezier_middle;
     control_out.bezier_end = v_out[gl_InvocationID].bezier_end;
 
-    gl_TessLevelOuter[0] = 15;
+    vec3 camera_to_point = gl_in[gl_InvocationID].gl_Position.xyz - camera_position;
+    float camera_distance = length(camera_to_point);
+    int tessLevel = 1;
+    if (camera_distance < render_distance) {
+        float clipDistance = camera_distance / render_distance;
+        tessLevel = int(clamp(15.0 * (1 - clipDistance), 1.0, 15.0));
+    }
+    gl_TessLevelOuter[0] = tessLevel;
     gl_TessLevelOuter[1] = 1;
-    gl_TessLevelOuter[2] = 15;
+    gl_TessLevelOuter[2] = tessLevel;
     gl_TessLevelOuter[3] = 1;
 
     gl_TessLevelInner[0] = 1; 
-    gl_TessLevelInner[1] = 15; 
+    gl_TessLevelInner[1] = tessLevel; 
 
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 }

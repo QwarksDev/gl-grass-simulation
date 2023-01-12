@@ -1,9 +1,16 @@
 #version 450
 
-in vec3 f_color;
+in vec3 f_position;
+in vec3 f_normalSmooth;
 
 layout(location=0) out vec4 output_color;
 
+uniform vec3 color;
+
+vec3 light_color = vec3(1.0, 1.0, 1.0);
+vec3 light_position = vec3(-10.0, 10.0, -50.0);
+
 void main() {
-  output_color = vec4(f_color, 1.0);
+  float c = clamp(dot(normalize(f_position - light_position), f_normalSmooth), 0.0, 1.0);
+  output_color = vec4(color * c, 1.0);
 }
