@@ -30,7 +30,7 @@ public:
     }
 
     void init_shader(Camera *camera);
-    void init_compute_shader();
+    void init_compute_shader(program* compute_prog);
 
 private:
     glm::vec3 *generate_grass_positions(glm::vec3 start_corner, glm::vec3 end_corner, int x_density, int y_density);

@@ -28,7 +28,25 @@ GLuint program::load_shader(const std::string &src, GLenum type)
         char *log = getlog(shader_id, GL_SHADER);
         if (log)
         {
-            auto str = type == GL_VERTEX_SHADER ? " vertex " : "fragment ";
+            std::string str;
+            switch (type) 
+            {
+                case GL_VERTEX_SHADER :
+                str = "vertex ";
+                break;
+                case GL_FRAGMENT_SHADER :
+                str = "fragment ";
+                break;
+                case GL_TESS_CONTROL_SHADER : 
+                str = "tess control ";
+                break;
+                case GL_TESS_EVALUATION_SHADER : 
+                str = "tess eval ";
+                break;
+                default :
+                str = "compute shader ";
+                break;
+            }
             std::cerr << "Shader " << str << shader_id << " : " << log
                       << std::endl;
             std::free(log);

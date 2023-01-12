@@ -3,6 +3,7 @@
 #include <GL/freeglut.h>
 #include <iostream>
 #include <fstream>
+#include <GLFW/glfw3.h>
 
 void check_gl_error(int line, const char* file) {
     GLenum err = glGetError();
@@ -13,6 +14,10 @@ void check_gl_error(int line, const char* file) {
         err = glGetError();   
         iter++; 
     }
+    const char* glfw_err;
+    err = glfwGetError(&glfw_err);
+    if (err != 0) 
+        std::cerr << "GLFW ERROR! " << file << ":" << line << "- Code: " << glfw_err << std::endl;
 }
 
 std::string load(const std::string &filename)
@@ -22,7 +27,7 @@ std::string load(const std::string &filename)
     std::string file_content = "";
     if (input_src_file.fail())
     {
-        std::cerr << "FAIL\n";
+        std::cerr << "FAIL loading: " << filename.c_str() << std::endl;
         return "";
     }
 

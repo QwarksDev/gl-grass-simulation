@@ -113,11 +113,15 @@ void grass::init_shader(Camera *camera)
     check_gl_error(__LINE__, __FILE__);
 }
 
-void grass::init_compute_shader()
+void grass::init_compute_shader(program *compute_prog)
 {
-    prog->set_uniform_float("anim_time", Time::get_time_passed());
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, vbo_bezier);
+    compute_prog->set_uniform_float("anim_time", Time::get_time_passed());
     check_gl_error(__LINE__, __FILE__);
+    if (vbo_bezier != -1)
+    {
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, vbo_bezier);
+        check_gl_error(__LINE__, __FILE__);
+    }
 
     glDispatchCompute(bezier_buffer.size() / 12, 1, 1);
 }

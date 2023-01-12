@@ -38,22 +38,32 @@ void framebuffer_size_callback(__attribute__((unused)) GLFWwindow *window,
 GLFWwindow *init_glfw()
 {
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    check_gl_error(__LINE__, __FILE__);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    check_gl_error(__LINE__, __FILE__);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    check_gl_error(__LINE__, __FILE__);
+    //glewExperimental = true;
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
     check_gl_error(__LINE__, __FILE__);
 
     GLFWwindow *window =
         glfwCreateWindow(WIDTH, HEIGHT, "Grass simulation project !", NULL, NULL);
+        check_gl_error(__LINE__, __FILE__);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         std::exit(1);
     }
+    std::cout << "GLFW version: " << glfwGetVersionString() << std::endl;
 
     glfwMakeContextCurrent(window);
+    check_gl_error(__LINE__, __FILE__);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //gladLoadGL(glfwGetProcAddress);
     check_gl_error(__LINE__, __FILE__);
     return window;
 }
@@ -81,6 +91,8 @@ void init_GL()
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 }
 
 void init_shaders()
@@ -93,10 +105,10 @@ void init_shaders()
     programs.push_back(bunny_prog);
 
     // Prog grass compute
-    /*const std::string compute_grass_shaders[] = {"shaders/grass/compute_grass.shd"};
+    const std::string compute_grass_shaders[] = {"shaders/grass/compute_grass.shd"};
     GLenum compute_grass_types[] = {GL_COMPUTE_SHADER};
-    program *compute_grass_prog = program::make_program(compute_grass_shaders, compute_grass_types, 2, nullptr);
-    programs.push_back(compute_grass_prog);*/
+    program *compute_grass_prog = program::make_program(compute_grass_shaders, compute_grass_types, 1, nullptr);
+    programs.push_back(compute_grass_prog);
 
     // Prog grass
     const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd", "shaders/grass/tess_eval_grass.shd", "shaders/grass/tess_control_grass.shd"};
@@ -136,11 +148,11 @@ int main()
         programs[0]->shader_function(programs[0], camera);
 
         // Compute shader
-        /*programs[1]->use();
-        grass_main->init_compute_shader();*/
+        programs[1]->use();
+        grass_main->init_compute_shader(programs[1]);
 
         // Grass
-        programs[1]->use();
+        programs[2]->use();
         grass_main->init_shader(camera);
 
         glfwSwapBuffers(window);
