@@ -113,7 +113,7 @@ void init_shaders()
     // Prog grass
     const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd", "shaders/grass/tess_eval_grass.shd", "shaders/grass/tess_control_grass.shd"};
     GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_TESS_EVALUATION_SHADER, GL_TESS_CONTROL_SHADER};
-    program *grass_prog = program::make_program(grass_shaders, grass_types, 2, nullptr);
+    program *grass_prog = program::make_program(grass_shaders, grass_types, 4, nullptr);
     grass_main = new grass(glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 0.0, 1.0), 20, 20, grass_prog);
     programs.push_back(grass_prog);
 }
@@ -148,8 +148,8 @@ int main()
         programs[0]->shader_function(programs[0], camera);
 
         // Compute shader
-        programs[1]->use();
-        grass_main->init_compute_shader(programs[1]);
+        //programs[1]->use();
+        //grass_main->init_compute_shader(programs[1]);
 
         // Grass
         programs[2]->use();

@@ -11,8 +11,11 @@ public:
     int size;
     GLuint vao_id;
     std::vector<GLfloat> vertex_buffer_data;
-    std::vector<vec3> bezier_buffer; 
-    GLint vbo_bezier;
+    std::vector<vec3> bezier_base1; 
+    std::vector<vec3> bezier_base2;
+    std::vector<vec3> bezier_middle;
+    std::vector<vec3> bezier_end; 
+
 
     program *prog;
 

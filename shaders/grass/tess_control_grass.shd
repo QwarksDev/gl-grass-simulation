@@ -8,16 +8,33 @@
 } gl_in[];
 
 in int gl_PatchVerticesIn; 
-in int gl_PrimitiveID; 
+in int gl_PrimitiveID;
 in int gl_InvocationID;*/
 
-in int grass_id_v[];
-out int grass_id[];
+out V_OUT
+{
+  vec3 bezier_base1;
+  vec3 bezier_base2;
+  vec3 bezier_middle;
+  vec3 bezier_end;
+} v_out[];
+
+patch out CONTROL_OUT
+{
+  vec3 bezier_base1;
+  vec3 bezier_base2;
+  vec3 bezier_middle;
+  vec3 bezier_end;
+} control_out;
 
 layout(vertices = 32) out; 
 
 void main() {
-    grass_id[gl_InvocationID] = grass_id_v[gl_InvocationID];
+    control_out.bezier_base1 = v_out[gl_InvocationID].bezier_base1;
+    control_out.bezier_base2 = v_out[gl_InvocationID].bezier_base2;
+    control_out.bezier_middle = v_out[gl_InvocationID].bezier_middle;
+    control_out.bezier_end = v_out[gl_InvocationID].bezier_end;
+
     gl_TessLevelOuter[0] = 1;
     gl_TessLevelOuter[1] = 1;
     gl_TessLevelOuter[2] = 1;

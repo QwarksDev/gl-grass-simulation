@@ -1,19 +1,30 @@
 #version 450
 
 in vec3 position;
-in vec3 normalSmooth;
+in vec3 bezier_base1; 
+in vec3 bezier_base2; 
+in vec3 bezier_middle;
+in vec3 bezier_end;
 
-out vec3 v_normal;
-out int grass_id_v;
+out V_OUT
+{
+  vec3 bezier_base1;
+  vec3 bezier_base2;
+  vec3 bezier_middle;
+  vec3 bezier_end;
+} v_out;
 
 vec3 light_color = vec3(1.0, 1.0, 1.0);
 vec3 light_position = vec3(-10.0, -10.0, -50.0);
 
 uniform mat4 model_view_matrix;
 uniform mat4 projection_matrix;
-uniform vec3 bezier_points[];
 
 void main() {
-  grass_id_v = gl_VertexID / 6;
-  gl_Position = projection_matrix * model_view_matrix * vec4(position, 1.0);
+  v_out.bezier_base1 = bezier_base1;
+  v_out.bezier_base2 = bezier_base2;
+  v_out.bezier_middle = bezier_middle;
+  v_out.bezier_end = bezier_end;
+
+  gl_Position =  vec4(position, 1.0) + 0.0000000001 * vec4(bezier_base1 + bezier_base2 + bezier_middle + bezier_end, 0.0) ;
 }
