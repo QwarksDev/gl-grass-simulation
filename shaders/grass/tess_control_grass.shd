@@ -11,18 +11,13 @@ in int gl_PatchVerticesIn;
 in int gl_PrimitiveID;
 in int gl_InvocationID;*/
 
-out V_OUT
+in V_OUT
 {
   vec3 bezier_base1;
   vec3 bezier_base2;
   vec3 bezier_middle;
   vec3 bezier_end;
 } v_out[];
-
-in vec3 v_out_bezier_base1[];
-in vec3 v_out_bezier_base2[];
-in vec3 v_out_bezier_middle[];
-in vec3 v_out_bezier_end[];
 
 patch out CONTROL_OUT
 {
@@ -32,7 +27,7 @@ patch out CONTROL_OUT
   vec3 bezier_end;
 } control_out;
 
-layout(vertices = 32) out; 
+layout(vertices = 1) out; 
 
 void main() {
     control_out.bezier_base1 = v_out[gl_InvocationID].bezier_base1;
@@ -41,12 +36,12 @@ void main() {
     control_out.bezier_end = v_out[gl_InvocationID].bezier_end;
 
     gl_TessLevelOuter[0] = 15;
-    gl_TessLevelOuter[1] = 1;
+    gl_TessLevelOuter[1] = 15;
     gl_TessLevelOuter[2] = 15;
-    gl_TessLevelOuter[3] = 1;
+    gl_TessLevelOuter[3] = 15;
 
-    gl_TessLevelInner[0] = 1; 
-    gl_TessLevelInner[1] = 1; 
+    gl_TessLevelInner[0] = 15; 
+    gl_TessLevelInner[1] = 15; 
 
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 }

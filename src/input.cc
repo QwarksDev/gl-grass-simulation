@@ -13,7 +13,7 @@
 // Handle camera movement
 void camera_moves(GLFWwindow *window, Camera *camera, float deltaTime)
 {
-    const float cameraSpeed = 10.0f * deltaTime; // adjust accordingly
+    const float cameraSpeed = 1.0f * deltaTime; // adjust accordingly
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
         camera->cameraPos += camera->objectForward * cameraSpeed;

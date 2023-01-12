@@ -76,10 +76,10 @@ void grass::setup_geometry()
         // Init bezier point
         for (int j = 0; j < 6; j++)
         {
-            bezier_base1.push_back(positions[i] + vec3(0.2, 0.0, 0.0));
-            bezier_base2.push_back(positions[i] + vec3(-0.2, 0.0, 0.0));
-            bezier_middle.push_back(positions[i] + vec3(0.0, 0.1, 0.0));
-            bezier_end.push_back(positions[i] + vec3(0.0, 0.6, 0.2));
+            bezier_base1.push_back(positions[i] + vec3(0.01, 0.0, 0.0));
+            bezier_base2.push_back(positions[i] + vec3(-0.01, 0.0, 0.0));
+            bezier_middle.push_back(positions[i] + vec3(0.0, 0.35, 0.0));
+            bezier_end.push_back(positions[i] + vec3(0.0, 0.4, 0.2));
         }
     }
     std::vector<GLuint> vbos = vector<GLuint>();

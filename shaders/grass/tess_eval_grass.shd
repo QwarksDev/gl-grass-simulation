@@ -27,9 +27,9 @@ vec3 Bezier(float step, vec3 bezier_base, vec3 bezier_middle, vec3 bezier_end) {
 
 void main() {
     vec3 p;
-    if (control_out.bezier_base1.x < -10.0)
+    //if (control_out.bezier_base1.x < -10.0)
     {
-    if (gl_TessCoord.y > 0.5)
+    if (gl_TessCoord.x > 0.5)
         p = Bezier(gl_TessCoord.y, control_out.bezier_base2, control_out.bezier_middle, control_out.bezier_end);
     else
         p = Bezier(gl_TessCoord.y, control_out.bezier_base1, control_out.bezier_middle, control_out.bezier_end);

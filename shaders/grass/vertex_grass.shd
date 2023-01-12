@@ -26,5 +26,5 @@ void main() {
   v_out.bezier_middle = bezier_middle;
   v_out.bezier_end = bezier_end;
 
-  gl_Position =  vec4(position, 1.0);
+  gl_Position =  vec4(position, 1.0);// + 0.0000000001 * vec4(bezier_base1 + bezier_base2 + bezier_middle + bezier_end, 0.0) ;
 }
