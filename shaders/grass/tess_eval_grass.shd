@@ -19,25 +19,28 @@ patch in CONTROL_OUT
  * @param step Étape de la courbe de Bézier
  * @return Point sur la courbe de Bézier
  */
-vec3 Bezier(float step_, vec3 bezier_base, vec3 bezier_middle, vec3 bezier_end) {
-    return bezier_base * (1 - step_) * (1 - step_)
-         +  bezier_middle        * (1 - step_) * step_       * 2.0f
-         +  bezier_end           * step_       * step_;
+vec3 Bezier(float step, vec3 bezier_base, vec3 bezier_middle, vec3 bezier_end) {
+    return bezier_base   * (1 - step) * (1 - step)
+         + bezier_middle * (1 - step) * step       * 2.0f
+         + bezier_end    * step       * step;
 }
 
 void main() {
-    /*vec3 p;
+    vec3 p;
+    if (control_out.bezier_base1.x < -10.0)
+    {
     if (gl_TessCoord.y > 0.5)
         p = Bezier(gl_TessCoord.y, control_out.bezier_base2, control_out.bezier_middle, control_out.bezier_end);
     else
         p = Bezier(gl_TessCoord.y, control_out.bezier_base1, control_out.bezier_middle, control_out.bezier_end);
     
-    gl_Position = projection_matrix * model_view_matrix * vec4(p, 1.0f);*/
+    gl_Position = projection_matrix * model_view_matrix * vec4(p, 1.0f);
+    }
 
- 	vec4 p1 = mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x);
+ 	/*vec4 p1 = mix(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_TessCoord.x);
      vec4 p2 = mix(gl_in[3].gl_Position, gl_in[2].gl_Position, gl_TessCoord.x); 
      vec4 p = mix(p1, p2, gl_TessCoord.y);
  
-     gl_Position = projection_matrix * model_view_matrix * p;
+     gl_Position = projection_matrix * model_view_matrix * p;*/
 }
 

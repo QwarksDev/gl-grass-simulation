@@ -73,13 +73,13 @@ void grass::setup_geometry()
             vertex_buffer_data.push_back(vertex_rectangle[v + 2] + position.z);
         }
 
-        for (int i = 0; i < 6; i++)
+        // Init bezier point
+        for (int j = 0; j < 6; j++)
         {
-            // Init bezier point
             bezier_base1.push_back(positions[i] + vec3(0.2, 0.0, 0.0));
             bezier_base2.push_back(positions[i] + vec3(-0.2, 0.0, 0.0));
-            bezier_middle.push_back(positions[i] + vec3(0.0, 1.5, 0.0));
-            bezier_end.push_back(positions[i] + vec3(0.0, 2.0, 0.0));
+            bezier_middle.push_back(positions[i] + vec3(0.0, 0.1, 0.0));
+            bezier_end.push_back(positions[i] + vec3(0.0, 0.6, 0.2));
         }
     }
     std::vector<GLuint> vbos = vector<GLuint>();
@@ -135,7 +135,7 @@ void grass::init_shader(Camera *camera)
     check_gl_error(__LINE__, __FILE__);
     glDrawArrays(GL_PATCHES, 0, vertex_buffer_data.size());
     check_gl_error(__LINE__, __FILE__);
-    //glDrawArrays(GL_TRIANGLES, 0, vertex_buffer_data.size());
+    // glDrawArrays(GL_TRIANGLES, 0, vertex_buffer_data.size());
     check_gl_error(__LINE__, __FILE__);
 }
 

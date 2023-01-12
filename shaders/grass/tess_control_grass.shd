@@ -19,6 +19,11 @@ out V_OUT
   vec3 bezier_end;
 } v_out[];
 
+in vec3 v_out_bezier_base1[];
+in vec3 v_out_bezier_base2[];
+in vec3 v_out_bezier_middle[];
+in vec3 v_out_bezier_end[];
+
 patch out CONTROL_OUT
 {
   vec3 bezier_base1;
@@ -35,9 +40,9 @@ void main() {
     control_out.bezier_middle = v_out[gl_InvocationID].bezier_middle;
     control_out.bezier_end = v_out[gl_InvocationID].bezier_end;
 
-    gl_TessLevelOuter[0] = 1;
+    gl_TessLevelOuter[0] = 15;
     gl_TessLevelOuter[1] = 1;
-    gl_TessLevelOuter[2] = 1;
+    gl_TessLevelOuter[2] = 15;
     gl_TessLevelOuter[3] = 1;
 
     gl_TessLevelInner[0] = 1; 
