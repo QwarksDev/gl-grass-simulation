@@ -45,7 +45,7 @@ void bind_buffers(GLuint id, GLuint buff_id, vector<vec3> datas)
 {
     glBindBuffer(GL_ARRAY_BUFFER, buff_id);
     check_gl_error(__LINE__, __FILE__);
-    glBufferData(GL_ARRAY_BUFFER, datas.size() * sizeof(float),
+    glBufferData(GL_ARRAY_BUFFER, datas.size() * sizeof(float) * 3,
                  (GLfloat *)datas.data(), GL_STATIC_DRAW);
     check_gl_error(__LINE__, __FILE__);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buff_id);
@@ -71,17 +71,21 @@ void grass::setup_geometry()
             vertex_buffer_data.push_back(vertex_rectangle[v] + position.x);
             vertex_buffer_data.push_back(vertex_rectangle[v + 1] + position.y);
             vertex_buffer_data.push_back(vertex_rectangle[v + 2] + position.z);
+
         }
 
         // Init bezier point
         for (int j = 0; j < 6; j++)
         {
-            bezier_base1.push_back(positions[i] + vec3(0.01, 0.0, 0.0));
-            bezier_base2.push_back(positions[i] + vec3(-0.01, 0.0, 0.0));
-            bezier_middle.push_back(positions[i] + vec3(0.0, 0.35, 0.0));
-            bezier_end.push_back(positions[i] + vec3(0.0, 0.4, 0.2));
+            bezier_base1.push_back(position + vec3(0.01, 0.0, 0.0));
+            bezier_base2.push_back(position + vec3(-0.01, 0.0, 0.0));
+            bezier_middle.push_back(position + vec3(0.0, 0.35, 0.0));
+            bezier_end.push_back(position + vec3(0.0, 0.4, 0.2));
         }
     }
+    std::cout << "Size: " << size << " Nb_Bezier: " << bezier_base1.size() << std::endl;
+    bezier_end[1] = (positions[1] + vec3(0.0, 0.4, -0.2));
+
     std::vector<GLuint> vbos = vector<GLuint>();
     vbos.push_back(get_attrib_location(prog->get_program_id(), "position"));
     vbos.push_back(get_attrib_location(prog->get_program_id(), "bezier_base1"));
