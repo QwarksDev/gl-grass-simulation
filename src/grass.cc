@@ -44,18 +44,25 @@ GLint get_attrib_location(int prog_id, const char *name)
     return vertex_location;
 }
 
-void bind_buffers(GLuint id, GLuint buff_id, vector<vec3> datas)
+void bind_buffers(GLuint id, GLuint buff_id, GLfloat *datas, int size)
 {
     glBindBuffer(GL_ARRAY_BUFFER, buff_id);
     check_gl_error(__LINE__, __FILE__);
-    glBufferData(GL_ARRAY_BUFFER, datas.size() * sizeof(float) * 3,
-                 (GLfloat *)datas.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, datas, GL_STATIC_DRAW);
     check_gl_error(__LINE__, __FILE__);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buff_id);
-    glBindBuffer(GL_ARRAY_BUFFER, buff_id);
     glVertexAttribPointer(id, 3, GL_FLOAT, GL_FALSE, 0, 0);
     check_gl_error(__LINE__, __FILE__);
     glEnableVertexAttribArray(id);
+    check_gl_error(__LINE__, __FILE__);
+}
+
+void bind_ssbo(GLuint buff_id, vector<vec4> datas, int location)
+{
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, buff_id);
+    check_gl_error(__LINE__, __FILE__);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, datas.size() * sizeof(float) * 4, datas.data(), GL_STATIC_DRAW);
+    check_gl_error(__LINE__, __FILE__);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, location, buff_id);
     check_gl_error(__LINE__, __FILE__);
 }
 
@@ -65,29 +72,27 @@ void grass::setup_geometry(float min_height, float max_height)
     bezier_base1 = vector<vec3>();
     bezier_base2 = vector<vec3>();
     bezier_middle = vector<vec3>();
-    bezier_end = vector<vec3>();
+    bezier_end = vector<vec4>();
     for (int i = 0; i < size; i++)
     {
         vec3 position = positions[i];
+
+        float height = min_height + (float(rand() % 1000) / 1000.0f) * (max_height - min_height);
+        float rand_x_dir = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f);
+        float rand_z_dir = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f);
+        vec3 dir = normalize(vec3(rand_x_dir, 0.0f, rand_z_dir));
+
         for (size_t v = 0; v < vertex_rectangle.size(); v += 3)
         {
             vertex_buffer_data.push_back(vertex_rectangle[v] + position.x);
             vertex_buffer_data.push_back(vertex_rectangle[v + 1] + position.y);
             vertex_buffer_data.push_back(vertex_rectangle[v + 2] + position.z);
 
-        }
-
-        float height = min_height + (float(rand() % 1000) / 1000.0f) * (max_height - min_height);
-        float rand_x_dir = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f);
-        float rand_z_dir = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f); 
-        vec3 dir = normalize(vec3(rand_x_dir, 0.0f, rand_z_dir)); 
-        // Init bezier point
-        for (int j = 0; j < 6; j++)
-        {
+            // Init bezier point
             bezier_base1.push_back(position + dir * 0.01f);
             bezier_base2.push_back(position + -dir * 0.01f);
             bezier_middle.push_back(position + vec3(0.0f, 0.35f, 0.0f));
-            bezier_end.push_back(position + dir * 0.2f + vec3(0.0f, height, 0.0f));
+            bezier_end.push_back(vec4(position + dir * 0.2f + vec3(0.0f, height, 0.0f), 0.0f));
         }
     }
 
@@ -104,28 +109,15 @@ void grass::setup_geometry(float min_height, float max_height)
     check_gl_error(__LINE__, __FILE__);
 
     // glGenBuffers(vbos.size(), vbos.data());
-    GLuint vbos_ids[vbos.size()];
+    vbos_ids = (GLuint *)malloc(sizeof(GLuint) * vbos.size());
     glGenBuffers(vbos.size(), vbos_ids);
 
-    { // Vertex location
-        check_gl_error(__LINE__, __FILE__);
-        glBindBuffer(GL_ARRAY_BUFFER, vbos_ids[0]);
-        check_gl_error(__LINE__, __FILE__);
-        glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(float),
-                     vertex_buffer_data.data(), GL_STATIC_DRAW);
-        check_gl_error(__LINE__, __FILE__);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, vbos_ids[0]);
-        glBindBuffer(GL_ARRAY_BUFFER, vbos_ids[0]);
-        glVertexAttribPointer(vbos[0], 3, GL_FLOAT, GL_FALSE, 0, 0);
-        check_gl_error(__LINE__, __FILE__);
-        glEnableVertexAttribArray(vbos[0]);
-        check_gl_error(__LINE__, __FILE__);
-    }
-
-    bind_buffers(vbos[1], vbos_ids[1], bezier_base1);
-    bind_buffers(vbos[2], vbos_ids[2], bezier_base2);
-    bind_buffers(vbos[3], vbos_ids[3], bezier_middle);
-    bind_buffers(vbos[4], vbos_ids[4], bezier_end);
+    bind_buffers(vbos[0], vbos_ids[0], vertex_buffer_data.data(), vertex_buffer_data.size() * sizeof(float));
+    bind_buffers(vbos[1], vbos_ids[1], (GLfloat *)bezier_base1.data(), bezier_base1.size() * sizeof(float) * 3);
+    bind_buffers(vbos[2], vbos_ids[2], (GLfloat *)bezier_base2.data(), bezier_base2.size() * sizeof(float) * 3);
+    bind_buffers(vbos[3], vbos_ids[3], (GLfloat *)bezier_middle.data(), bezier_middle.size() * sizeof(float) * 3);
+    bind_buffers(vbos[4], vbos_ids[4], (GLfloat *)bezier_end.data(), bezier_end.size() * sizeof(float) * 4);
+    bind_ssbo(vbos_ids[4], bezier_end, 0);
 
     check_gl_error(__LINE__, __FILE__);
     glBindVertexArray(0);
@@ -134,17 +126,11 @@ void grass::setup_geometry(float min_height, float max_height)
 void grass::init_shader(Camera *camera)
 {
     init_view_projection(prog, camera->get_view());
-    // prog->set_uniform_float("anim_time", Time::get_time_passed());
-    //  prog->set_uniform_int("nb_grass", size);
-    //  glUniform3fv(glGetUniformLocation(prog->get_program_id(), "pointPositions"), bezier_buffer.size() * 3,
-    //  glm::value_ptr(bezier_buffer[0]));
     glBindVertexArray(vao_id);
     check_gl_error(__LINE__, __FILE__);
     glPatchParameteri(GL_PATCH_VERTICES, 6);
     check_gl_error(__LINE__, __FILE__);
     glDrawArrays(GL_PATCHES, 0, vertex_buffer_data.size());
-    check_gl_error(__LINE__, __FILE__);
-    // glDrawArrays(GL_TRIANGLES, 0, vertex_buffer_data.size());
     check_gl_error(__LINE__, __FILE__);
 }
 
@@ -152,11 +138,9 @@ void grass::init_compute_shader(program *compute_prog)
 {
     compute_prog->set_uniform_float("anim_time", Time::get_time_passed());
     check_gl_error(__LINE__, __FILE__);
-    /*if (vbo_bezier != -1)
-    {
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, vbo_bezier);
-        check_gl_error(__LINE__, __FILE__);
-    }*/
 
-    // glDispatchCompute(bezier_buffer.size() / 12, 1, 1);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, vbos_ids[4]);
+    check_gl_error(__LINE__, __FILE__);
+
+    glDispatchCompute(size * 6, 1, 1);
 }

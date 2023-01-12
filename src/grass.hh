@@ -14,7 +14,8 @@ public:
     std::vector<vec3> bezier_base1; 
     std::vector<vec3> bezier_base2;
     std::vector<vec3> bezier_middle;
-    std::vector<vec3> bezier_end; 
+    std::vector<vec4> bezier_end;
+    GLuint *vbos_ids; 
 
 
     program *prog;
@@ -30,6 +31,7 @@ public:
     ~grass()
     {
         free(positions);
+        free(vbos_ids);
     }
 
     void init_shader(Camera *camera);

@@ -4,17 +4,18 @@
 layout(local_size_x = 1024) in;
 
 layout(std430, binding = 0) buffer bezier_points {
-    vec3 bezier_pos[];
+    vec4 bezier_end[];
 };
 
 uniform float anim_time;
+
 // Wind and get back gestion
 void main() {
-    uint index = gl_GlobalInvocationID.x; 
-    vec3 point_base1 = bezier_pos[index * 4];
-    vec3 point_base2 = bezier_pos[index * 4 + 1];
-    vec3 point_mid = bezier_pos[index * 4 + 2];
-    vec3 point_end = bezier_pos[index * 4 + 3];
+    uint id = gl_GlobalInvocationID.x;
+    bezier_end[id].y += anim_time * 0.000000000000000001;
+    /*for (uint index = id * 6; index < id * 6 + 7; index++) 
+    { 
+        bezier_end[index].y = anim_time;
+    }*/
 
-    bezier_pos[index * 4 + 3].y = anim_time;
 }
