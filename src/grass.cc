@@ -56,7 +56,7 @@ void bind_buffers(GLuint id, GLuint buff_id, GLfloat *datas, int size)
     check_gl_error(__LINE__, __FILE__);
 }
 
-void bind_ssbo(GLuint buff_id, vector<vec4> datas, int location)
+void bind_ssbo(GLuint buff_id, vector<vec3> datas, int location)
 {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, buff_id);
     check_gl_error(__LINE__, __FILE__);
@@ -72,7 +72,7 @@ void grass::setup_geometry(float min_height, float max_height)
     bezier_base1 = vector<vec3>();
     bezier_base2 = vector<vec3>();
     bezier_middle = vector<vec3>();
-    bezier_end = vector<vec4>();
+    bezier_end = vector<vec3>();
     for (int i = 0; i < size; i++)
     {
         vec3 position = positions[i];
@@ -92,7 +92,7 @@ void grass::setup_geometry(float min_height, float max_height)
             bezier_base1.push_back(position + dir * 0.01f);
             bezier_base2.push_back(position + -dir * 0.01f);
             bezier_middle.push_back(position + vec3(0.0f, 0.35f, 0.0f));
-            bezier_end.push_back(vec4(position + dir * 0.2f + vec3(0.0f, height, 0.0f), 0.0f));
+            bezier_end.push_back(position + dir * 0.2f + vec3(0.0f, height, 0.0f));
         }
     }
 
@@ -116,7 +116,7 @@ void grass::setup_geometry(float min_height, float max_height)
     bind_buffers(vbos[1], vbos_ids[1], (GLfloat *)bezier_base1.data(), bezier_base1.size() * sizeof(float) * 3);
     bind_buffers(vbos[2], vbos_ids[2], (GLfloat *)bezier_base2.data(), bezier_base2.size() * sizeof(float) * 3);
     bind_buffers(vbos[3], vbos_ids[3], (GLfloat *)bezier_middle.data(), bezier_middle.size() * sizeof(float) * 3);
-    bind_buffers(vbos[4], vbos_ids[4], (GLfloat *)bezier_end.data(), bezier_end.size() * sizeof(float) * 4);
+    bind_buffers(vbos[4], vbos_ids[4], (GLfloat *)bezier_end.data(), bezier_end.size() * sizeof(float) * 3);
     bind_ssbo(vbos_ids[4], bezier_end, 0);
 
     check_gl_error(__LINE__, __FILE__);
@@ -136,11 +136,11 @@ void grass::init_shader(Camera *camera)
 
 void grass::init_compute_shader(program *compute_prog)
 {
-    compute_prog->set_uniform_float("anim_time", Time::get_time_passed());
+    /*compute_prog->set_uniform_float("anim_time", Time::get_time_passed());
     check_gl_error(__LINE__, __FILE__);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, vbos_ids[4]);
     check_gl_error(__LINE__, __FILE__);
 
-    glDispatchCompute(size * 6, 1, 1);
+    glDispatchCompute(size * 6, 1, 1);*/
 }

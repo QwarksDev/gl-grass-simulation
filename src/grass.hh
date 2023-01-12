@@ -14,7 +14,7 @@ public:
     std::vector<vec3> bezier_base1; 
     std::vector<vec3> bezier_base2;
     std::vector<vec3> bezier_middle;
-    std::vector<vec4> bezier_end;
+    std::vector<vec3> bezier_end;
     GLuint *vbos_ids; 
 
 
