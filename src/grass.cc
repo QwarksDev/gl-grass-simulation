@@ -22,7 +22,10 @@ vec3 *grass::generate_grass_positions(vec3 start_corner, vec3 end_corner, int x_
     {
         for (int j = 0; j < z_density; j++)
         {
-            vec3 position = start_corner + vec3(x_distance * i, start_corner.y, j * z_distance);
+            float offset_z = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f) * z_distance / 2.0f;
+            float offset_x = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f) * x_distance / 2.0f;
+            vec3 position = start_corner + vec3(x_distance * i + offset_x, start_corner.y, j * z_distance + offset_z);
+
             grass_positions[i * z_density + j] = position;
         }
     }
@@ -56,7 +59,7 @@ void bind_buffers(GLuint id, GLuint buff_id, vector<vec3> datas)
     check_gl_error(__LINE__, __FILE__);
 }
 
-void grass::setup_geometry()
+void grass::setup_geometry(float min_height, float max_height)
 {
     vertex_buffer_data = vector<GLfloat>();
     bezier_base1 = vector<vec3>();
@@ -74,17 +77,19 @@ void grass::setup_geometry()
 
         }
 
+        float height = min_height + (float(rand() % 1000) / 1000.0f) * (max_height - min_height);
+        float rand_x_dir = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f);
+        float rand_z_dir = ((float(rand() % 1000) / 1000.0f) * 2.0f - 1.0f); 
+        vec3 dir = normalize(vec3(rand_x_dir, 0.0f, rand_z_dir)); 
         // Init bezier point
         for (int j = 0; j < 6; j++)
         {
-            bezier_base1.push_back(position + vec3(0.01, 0.0, 0.0));
-            bezier_base2.push_back(position + vec3(-0.01, 0.0, 0.0));
-            bezier_middle.push_back(position + vec3(0.0, 0.35, 0.0));
-            bezier_end.push_back(position + vec3(0.0, 0.4, 0.2));
+            bezier_base1.push_back(position + dir * 0.01f);
+            bezier_base2.push_back(position + -dir * 0.01f);
+            bezier_middle.push_back(position + vec3(0.0f, 0.35f, 0.0f));
+            bezier_end.push_back(position + dir * 0.2f + vec3(0.0f, height, 0.0f));
         }
     }
-    std::cout << "Size: " << size << " Nb_Bezier: " << bezier_base1.size() << std::endl;
-    bezier_end[1] = (positions[1] + vec3(0.0, 0.4, -0.2));
 
     std::vector<GLuint> vbos = vector<GLuint>();
     vbos.push_back(get_attrib_location(prog->get_program_id(), "position"));
