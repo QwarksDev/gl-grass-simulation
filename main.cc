@@ -28,6 +28,7 @@
 
 std::vector<program *> programs;
 grass *grass_main;
+obj* sphere_object; 
 
 void framebuffer_size_callback(__attribute__((unused)) GLFWwindow *window,
                                int width, int height)
@@ -111,18 +112,27 @@ void init_shaders()
     programs.push_back(compute_grass_prog);
 
     // Prog grass
-    const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd", "shaders/grass/tess_eval_grass.shd", "shaders/grass/tess_control_grass.shd"};
-    GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_TESS_EVALUATION_SHADER, GL_TESS_CONTROL_SHADER};
-    program *grass_prog = program::make_program(grass_shaders, grass_types, 4);
-    grass_main = new grass(glm::vec3(0.5, 0.0, 0.0), glm::vec3(3.0, 0.0, 2.5), 20, 20, grass_prog, 0.1, 0.4);
+    const std::string grass_shaders[] = {"shaders/grass/vertex_grass.shd", "shaders/grass/fragment_grass.shd", 
+    "shaders/grass/tess_eval_grass.shd", "shaders/grass/tess_control_grass.shd", "shaders/grass/geometry_grass.shd"};
+    GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_TESS_EVALUATION_SHADER, GL_TESS_CONTROL_SHADER, GL_GEOMETRY_SHADER};
+    program *grass_prog = program::make_program(grass_shaders, grass_types, 5);
+    grass_main = new grass(glm::vec3(0.5, 0.0, 0.0), glm::vec3(2.5, 0.0, 2.0), 80, 80, grass_prog, 0.1, 0.4);
     programs.push_back(grass_prog);
     
     // Prog floor
     const std::string floor_shaders[] = {"shaders/vertex_simple.shd", "shaders/fragment.shd"};
     GLenum floor_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
-    program *floor_prog = program::make_program(bunny_shaders, bunny_types, 2);
-    bunny_prog->add_object(setup_floor(floor_prog->get_program_id()));
+    program *floor_prog = program::make_program(floor_shaders, floor_types, 2);
+    floor_prog->add_object(setup_floor(floor_prog->get_program_id()));
     programs.push_back(floor_prog);
+
+    //Prog sphere
+    const std::string sphere_shaders[] = {"shaders/vertex_sphere.shd", "shaders/fragment.shd"};
+    GLenum sphere_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER};
+    program *sphere_prog = program::make_program(sphere_shaders, sphere_types, 2);
+    sphere_object = setup_sphere(sphere_prog->get_program_id());
+    sphere_prog->add_object(sphere_object);
+    programs.push_back(sphere_prog);
 }
 
 int main()
@@ -152,25 +162,29 @@ int main()
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         // Bunny
         programs[0]->use();
-        init_simple_shaders(programs[0], camera, glm::vec3(1.0, 1.0, 1.0));
+        init_simple_shaders(programs[0], camera, glm::vec3(1.0, 1.0, 1.0), 0);
 
         // Floor
         programs[3]->use();
-        init_simple_shaders(programs[3], camera, glm::vec3(155.0 / 255.0, 118.0 / 255.0, 83.0 / 255.0));
+        init_simple_shaders(programs[3], camera, glm::vec3(155.0 / 255.0, 118.0 / 255.0, 83.0 / 255.0), 1);
+
+        // Sphere
+        programs[4]->use();
+        sphere_object->scale = 0.3f;
+        init_sphere_shaders(programs[4], camera, glm::vec3(0.8, 0.3, 0.3));
 
         // Compute shader
         programs[1]->use();
-        grass_main->init_compute_shader(programs[1]);
+        grass_main->init_compute_shader(programs[1], sphere_object);
 
         // Grass
         programs[2]->use();
         grass_main->init_shader(camera);
 
-
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        process_input(window, camera);
+        process_input(window, camera, sphere_object);
     }
     glfwTerminate();
     delete grass_main;

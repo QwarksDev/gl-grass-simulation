@@ -21,6 +21,8 @@ layout(std430, binding = 3) buffer bezier_points2 {
 };
 
 uniform float anim_time;
+uniform vec3 sphere_position; 
+uniform float sphere_radius;
 
 float strength = 0.4f;
 vec3 direction = normalize(vec3(2.0f, 0.0f, 0.0f));
@@ -43,29 +45,45 @@ void main() {
                          position_blade[id / 6 * 3 + 1],
                          position_blade[id / 6 * 3 + 2]);
 
+    vec3 start_position = curr_position;
+    vec3 middle_position;
+    vec3 tip_position;
     float curr_height = height[id / 6];
 
-    vec3 wind_dir = get_strength(curr_position.xy)
-                  * normalize(get_direction(curr_position.xy));
-    
-    vec3 displacement = wind_dir * curr_height;
 
-    float h = sqrt(curr_height * curr_height / length(displacement) * length(displacement));
-
-    vec3 middle_position = curr_position + vec3(0.0f, 2.0f * h / 3.0f, 0.0f);
+    // Sphere Gestion
+    vec3 sphere_dir = curr_position + vec3(0.0, curr_height, 0.0) - sphere_position;
+    float dist = length(sphere_dir);
+    if (dist < sphere_radius) 
+    {   
+        if (dot(sphere_dir, vec3(0.0, 1.0, 0.0)) > 0.7 || dist > curr_height)
+        {
+            tip_position = start_position + normalize(sphere_dir) * curr_height / 2.0 + vec3(0.0f, 0.01, 0.0f);
+            middle_position = start_position + normalize(sphere_dir) * curr_height  / 3.0 + vec3(0.0f, 0.01, 0.0f);
+        }
+        else 
+        {
+            tip_position = curr_position + vec3(0.0, curr_height, 0.0) + normalize(sphere_dir) * (sphere_radius + 0.01 - dist);
+            middle_position =  curr_position + vec3(0.0, 2 * curr_height / 3, 0.0) + normalize(sphere_dir) * (sphere_radius + 0.01 - dist);
+        }
+    }
+    else 
+    {
+        // Wind Gestion
+        vec3 wind_dir = get_strength(curr_position.xy)
+                    * normalize(get_direction(curr_position.xy));
+        vec3 displacement = wind_dir * curr_height;
+        float h = sqrt(curr_height * curr_height / length(displacement) * length(displacement));
+        middle_position = curr_position + vec3(0.0f, 2.0f * h / 3.0f, 0.0f);
+        tip_position = curr_position + displacement + vec3(0.0f, h, 0.0f);
+        
+    }
 
     bezier_middle[id * 3] = middle_position.x;
     bezier_middle[id * 3 + 1] = middle_position.y;
     bezier_middle[id * 3 + 2] = middle_position.z;
 
-    vec3 tip_position = curr_position + displacement + vec3(0.0f, h, 0.0f);
-
     bezier_end[id * 3] = tip_position.x;
     bezier_end[id * 3 + 1] = tip_position.y;
     bezier_end[id * 3 + 2] = tip_position.z;
-    
-    /*for (uint index = id * 6; index < id * 6 + 7; index+=6) 
-    { 
-        bezier_end[index * 3 + 1] = anim_time;
-    }*/
 }

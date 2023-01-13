@@ -1,0 +1,28 @@
+#version 450
+
+layout ( triangles ) in; 
+layout ( triangle_strip, max_vertices=3 ) out;
+
+uniform mat4 projection_matrix;
+uniform mat4 model_view_matrix;
+
+out vec3 f_position;
+out vec3 f_normal;
+vec3 light_position = vec3(-10.0, 10.0, 50.0);
+
+void main()
+{ 
+    vec3 lightDir = normalize(light_position - gl_in[0].gl_Position.xyz);
+    vec3 normal = normalize(cross(vec3(gl_in[1].gl_Position - gl_in[0].gl_Position), vec3(gl_in[2].gl_Position - gl_in[0].gl_Position)));
+    if (dot(normal, lightDir) > 0)
+        normal = -normal;
+    for (int i = 0; i < 3; i++) 
+    {
+        gl_Position = projection_matrix * model_view_matrix * gl_in[i].gl_Position;
+        f_position = gl_in[i].gl_Position.xyz;
+        f_normal = normal;
+        EmitVertex();
+    }
+
+    EndPrimitive();   
+}

@@ -57,16 +57,40 @@ void camera_moves(GLFWwindow *window, Camera *camera, float deltaTime)
 
 }
 
+void object_moves(GLFWwindow *window, obj* object, float deltaTime) 
+{
+    if (object == nullptr)
+        return;
+
+    const float object_speed = 1.0f * deltaTime; // adjust accordingly
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        object->position += vec3(0.0, 0.0, 1.0) *  object_speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+         object->position -= vec3(0.0, 0.0, 1.0) *  object_speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+    {
+         object->position -= vec3(1.0, 0.0, 0.0) *  object_speed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+    {
+         object->position += vec3(1.0, 0.0, 0.0) *  object_speed;
+    }
+    
+}
+
 float last_frame = 0;
 
-void process_input(GLFWwindow *window, Camera *camera)
+void process_input(GLFWwindow *window, Camera *camera, obj* object_selected)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    float currentFrame = glfwGetTime();
-    float deltaTime = currentFrame - last_frame;
-    last_frame = currentFrame;
+    float deltaTime = Time::delta_time;
 
     camera_moves(window, camera, deltaTime);
+    object_moves(window, object_selected,  deltaTime);
 }

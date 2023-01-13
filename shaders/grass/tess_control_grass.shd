@@ -43,7 +43,7 @@ void main() {
     int tessLevel = 1;
     if (camera_distance < render_distance) {
         float clipDistance = camera_distance / render_distance;
-        tessLevel = int(clamp(15.0 * (1 - clipDistance), 1.0, 15.0));
+        tessLevel = int(clamp(15.0 * (1 - clipDistance), 1.0, 10.0));
     }
     gl_TessLevelOuter[0] = tessLevel;
     gl_TessLevelOuter[1] = 1;

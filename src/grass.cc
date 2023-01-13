@@ -7,6 +7,7 @@
 #include "shaders_init.hh"
 #include "utils.hh"
 #include "input.hh"
+#include "obj.hh"
 
 using namespace std;
 using namespace glm;
@@ -30,40 +31,6 @@ vec3 *grass::generate_grass_positions(vec3 start_corner, vec3 end_corner, int x_
         }
     }
     return grass_positions;
-}
-
-GLint get_attrib_location(int prog_id, const char *name)
-{
-    GLint vertex_location = glGetAttribLocation(prog_id, name);
-    check_gl_error(__LINE__, __FILE__);
-    if (vertex_location == -1)
-    {
-        std::cerr << "Error init " << name << " location !" << std::endl;
-        exit(1);
-    }
-    return vertex_location;
-}
-
-void bind_buffers(GLuint id, GLuint buff_id, GLfloat *datas, int size)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, buff_id);
-    check_gl_error(__LINE__, __FILE__);
-    glBufferData(GL_ARRAY_BUFFER, size, datas, GL_STATIC_DRAW);
-    check_gl_error(__LINE__, __FILE__);
-    glVertexAttribPointer(id, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    check_gl_error(__LINE__, __FILE__);
-    glEnableVertexAttribArray(id);
-    check_gl_error(__LINE__, __FILE__);
-}
-
-void bind_ssbo(GLuint buff_id, GLfloat *datas, int size, int location, GLenum type)
-{
-    glBindBuffer(type, buff_id);
-    check_gl_error(__LINE__, __FILE__);
-    glBufferData(type, size, datas, GL_STATIC_DRAW);
-    check_gl_error(__LINE__, __FILE__);
-    glBindBufferBase(type, location, buff_id);
-    check_gl_error(__LINE__, __FILE__);
 }
 
 void grass::setup_geometry(float min_height, float max_height)
@@ -138,7 +105,7 @@ void grass::init_shader(Camera *camera)
 {
     init_view_projection(prog, camera->get_view());
     prog->set_uniform_vec3("camera_position", camera->cameraPos);
-    prog->set_uniform_float("render_distance", 10.0f);
+    prog->set_uniform_float("render_distance", 4.0f);
     glBindVertexArray(vao_id);
     check_gl_error(__LINE__, __FILE__);
     glPatchParameteri(GL_PATCH_VERTICES, 6);
@@ -147,9 +114,13 @@ void grass::init_shader(Camera *camera)
     check_gl_error(__LINE__, __FILE__);
 }
 
-void grass::init_compute_shader(program *compute_prog)
+void grass::init_compute_shader(program *compute_prog, obj* sphere)
 {
     compute_prog->set_uniform_float("anim_time", Time::get_time_passed());
+    compute_prog->set_uniform_vec3("sphere_position", sphere->position);
+    float radius = sphere->scale;
+    compute_prog->set_uniform_float("sphere_radius", radius);
+
     check_gl_error(__LINE__, __FILE__);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, vbos_ids[4]);

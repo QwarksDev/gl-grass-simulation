@@ -6,4 +6,5 @@
 #include "camera.hh"
 
 void init_view_projection(program *program, glm::mat4 view);
-void init_simple_shaders(program *program, Camera *camera, glm::vec3 color);
+void init_simple_shaders(program *program, Camera *camera, glm::vec3 color, int force_color);
+void init_sphere_shaders(program *program, Camera *camera, glm::vec3 color);
