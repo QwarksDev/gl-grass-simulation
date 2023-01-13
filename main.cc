@@ -28,6 +28,7 @@
 
 std::vector<program *> programs;
 grass *grass_main;
+grass *grass_mini;
 obj* sphere_object; 
 
 void framebuffer_size_callback(__attribute__((unused)) GLFWwindow *window,
@@ -116,7 +117,7 @@ void init_shaders()
     "shaders/grass/tess_eval_grass.shd", "shaders/grass/tess_control_grass.shd", "shaders/grass/geometry_grass.shd"};
     GLenum grass_types[] = {GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_TESS_EVALUATION_SHADER, GL_TESS_CONTROL_SHADER, GL_GEOMETRY_SHADER};
     program *grass_prog = program::make_program(grass_shaders, grass_types, 5);
-    grass_main = new grass(glm::vec3(0.5, 0.0, 0.0), glm::vec3(2.5, 0.0, 2.0), 80, 80, grass_prog, 0.1, 0.4);
+    grass_main = new grass(glm::vec3(0.5, 0.0, 0.0), glm::vec3(3.5, 0.0, 3.0), 80, 80, grass_prog, 0.1, 0.4);
     programs.push_back(grass_prog);
     
     // Prog floor
@@ -133,6 +134,16 @@ void init_shaders()
     sphere_object = setup_sphere(sphere_prog->get_program_id());
     sphere_prog->add_object(sphere_object);
     programs.push_back(sphere_prog);
+
+    // Prog mini_grass
+    /*program *mini_grass_prog = program::make_program(grass_shaders, grass_types, 5);
+    grass_mini = new grass(glm::vec3(-0.5, 0.0, 1.0), glm::vec3(-1.0, 0.0, 1.5), 8, 8, mini_grass_prog, 0.1, 0.4);
+    programs.push_back(mini_grass_prog);
+    
+    // Mini grass compute
+    program *mini_compute_grass_prog = program::make_program(compute_grass_shaders, compute_grass_types, 1);
+    programs.push_back(mini_compute_grass_prog);*/
+
 }
 
 int main()
@@ -177,9 +188,15 @@ int main()
         programs[1]->use();
         grass_main->init_compute_shader(programs[1], sphere_object);
 
+        //programs[6]->use();
+        //grass_mini->init_compute_shader(programs[6], sphere_object);
+
         // Grass
         programs[2]->use();
         grass_main->init_shader(camera);
+
+        //programs[5]->use();
+        //grass_mini->init_shader(camera);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
